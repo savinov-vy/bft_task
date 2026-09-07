@@ -1,0 +1,17 @@
+services:
+
+  bft_task_db:
+    image: postgres:14-alpine
+    container_name: bft_task_db
+    networks:
+      - networkDbNetwork
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=bft_task_db
+    ports:
+      - "5437:5432"
+
+networks:
+  networkDbNetwork:
+    driver: bridge
