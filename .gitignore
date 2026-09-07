@@ -20,6 +20,15 @@ target/
 *.iml
 *.ipr
 
+# Created by https://www.toptal.com/developers/gitignore/api/vaadin
+# Edit at https://www.toptal.com/developers/gitignore?templates=vaadin
+
+### Vaadin ###
+.vaadin-designer
+.designer
+
+# End of https://www.toptal.com/developers/gitignore/api/vaadin
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

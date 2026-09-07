@@ -54,9 +54,7 @@ function generateItemsTree(appId, nodeId) {
       checked: child._checked,
       keepOpen: child._keepOpen,
       className: child.className,
-      theme: child.__theme,
-      tooltip: child.tooltip,
-      tooltipPosition: child.tooltipPosition
+      theme: child.__theme
     };
     // Do not hardcode tag name to allow `vaadin-menu-bar-item`
     if (child._hasVaadinItemMixin && child._containerNodeId) {
