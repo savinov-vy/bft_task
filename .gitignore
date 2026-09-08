@@ -26,6 +26,7 @@ target/
 ### Vaadin ###
 .vaadin-designer
 .designer
+/src/main/frontend/generated
 
 # End of https://www.toptal.com/developers/gitignore/api/vaadin
 
