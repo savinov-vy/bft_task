@@ -11,54 +11,77 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.savinov.bft_task.entity.Customer;
+import ru.savinov.bft_task.factory.ButtonFactory;
+import ru.savinov.bft_task.factory.FieldFactory;
+import ru.savinov.bft_task.factory.HorizontalLayoutFactory;
 import ru.savinov.bft_task.repository.CustomerRepository;
 
 
 @SpringComponent
 @UIScope
-@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerEditor extends VerticalLayout implements KeyNotifier {
 
-    private final CustomerRepository repository;
+    final CustomerRepository repository;
+    Customer customer;
 
-    private Customer customer;
+    TextField firstName;
+    TextField lastName;
 
-    TextField firstName = new TextField("First name");
-    TextField lastName = new TextField("Last name");
-
-    Button save = new Button("Save", VaadinIcon.CHECK.create());
-    Button cancel = new Button("Cancel");
-    Button delete = new Button("Delete", VaadinIcon.TRASH.create());
-    HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
+    Button save;
+    Button cancel;
+    Button delete;
+    HorizontalLayout actions;
 
     Binder<Customer> binder = new Binder<>(Customer.class);
     private ChangeHandler changeHandler;
 
     @Autowired
     public CustomerEditor(CustomerRepository repository) {
+        initFields();
         this.repository = repository;
 
         add(firstName, lastName, actions);
 
-        // bind using naming convention
         binder.bindInstanceFields(this);
 
-        // Configure and style components
         setSpacing(true);
-
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
         addKeyPressListener(Key.ENTER, e -> save());
 
-        // wire action buttons to save, delete and reset
-        save.addClickListener(e -> save());
-        delete.addClickListener(e -> delete());
-        cancel.addClickListener(e -> editCustomer(customer));
         setVisible(false);
+    }
+
+    private void initFields() {
+        lastName = FieldFactory.builder()
+                .text("Last Name")
+                .build();
+        firstName = FieldFactory.builder()
+                .text("First Name")
+                .build();
+        save = ButtonFactory.builder()
+                .icon(VaadinIcon.CHECK)
+                .text("Save")
+                .theme(ButtonVariant.LUMO_PRIMARY)
+                .withClickListener(e -> save())
+                .build();
+        cancel = ButtonFactory.builder()
+                .text("Cancel")
+                .withClickListener(e -> editCustomer(customer))
+                .build();
+        delete = ButtonFactory.builder()
+                .theme(ButtonVariant.LUMO_ERROR)
+                .text("Delete")
+                .icon(VaadinIcon.TRASH)
+                .withClickListener(e -> delete())
+                .build();
+        actions = HorizontalLayoutFactory.builder()
+                .add(save, cancel, delete)
+                .build();
     }
 
     void delete() {
@@ -86,8 +109,7 @@ public class CustomerEditor extends VerticalLayout implements KeyNotifier {
             // In a more complex app, you might want to load
             // the entity/DTO with lazy loaded relations for editing
             customer = repository.findById(c.getId()).get();
-        }
-        else {
+        } else {
             customer = c;
         }
         cancel.setVisible(persisted);
