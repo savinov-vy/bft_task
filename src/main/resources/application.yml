@@ -18,7 +18,7 @@ spring:
     properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
 
   datasource:
     driver-class-name: org.postgresql.Driver
