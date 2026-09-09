@@ -2,82 +2,104 @@ package ru.savinov.bft_task.frontend;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
-import org.springframework.util.StringUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.value.ValueChangeMode;
+import lombok.extern.slf4j.Slf4j;
 import ru.savinov.bft_task.frontend.dto.CustomerDto;
+import ru.savinov.bft_task.frontend.factory.ButtonFactory;
+import ru.savinov.bft_task.frontend.factory.FieldFactory;
+import ru.savinov.bft_task.frontend.factory.GridFactory;
+import ru.savinov.bft_task.frontend.factory.HorizontalLayoutFactory;
 import ru.savinov.bft_task.service.CustomerService;
 
-@Route
+import static org.springframework.util.StringUtils.hasText;
+
+@Slf4j
+@Route("")
 public class CustomersView extends VerticalLayout {
     private final CustomerService customerService;
 
     private final CustomerEditor editor;
 
-    final Grid<CustomerDto> grid;
+    private Grid<CustomerDto> grid;
 
-    final TextField filter;
+    private Button addNewBtn;
+    private Button searchBtn;
+    private HorizontalLayout actions;
 
-    private final Button addNewBtn;
+    private HorizontalLayout filterLayout;
+    private TextField lastNameFilter;
+    private TextField ageFilter;
+
 
     public CustomersView(CustomerService customerService, CustomerEditor editor) {
         this.customerService = customerService;
         this.editor = editor;
-        this.grid = new Grid<>(CustomerDto.class);
-        this.filter = new TextField();
-        this.addNewBtn = new Button("New customer", VaadinIcon.PLUS.create());
-
-        // build layout
-        HorizontalLayout actions = new HorizontalLayout(filter, addNewBtn);
+        initUiComponents();
         add(actions, grid, editor);
-
-        grid.setHeight("300px");
-        grid.setColumns("id", "firstName", "lastName");
-        grid.getColumnByKey("id").setWidth("50px").setFlexGrow(0);
-
-        filter.setPlaceholder("Filter by last name");
-
-        // Hook logic to components
-
-        // Replace listing with filtered content when user changes filter
-        filter.setValueChangeMode(ValueChangeMode.LAZY);
-        filter.addValueChangeListener(e -> listCustomers(e.getValue()));
-
-        // Connect selected Customer to editor or hide if none is selected
-        grid.asSingleSelect().addValueChangeListener(e -> {
-            editor.editCustomer(e.getValue());
-        });
-
-        // Instantiate and edit new Customer the new button is clicked
-        addNewBtn.addClickListener(
-                e -> editor.editCustomer(CustomerDto.builder()
-                                                                .lastName("")
-                                                                .firstName("")
-                                                                .build())
-        );
-
-        // Listen changes made by the editor, refresh data from backend
         editor.setChangeHandler(() -> {
             editor.setVisible(false);
-            listCustomers(filter.getValue());
+            listCustomers(lastNameFilter.getValue(), ageFilter.getValue());
         });
-
-        // Initialize listing
-        listCustomers(null);
+        listCustomers();
     }
 
-    // tag::listCustomers[]
-    void listCustomers(String filterText) {
-        if (StringUtils.hasText(filterText)) {
-            grid.setItems(customerService.findByLastName(filterText));
+    private void initUiComponents() {
+        grid = GridFactory.builder(CustomerDto.class)
+                .columns("id", "firstName", "lastName", "age", "payment")
+                .onSelect(editor::editCustomer)
+                .build();
+        lastNameFilter = FieldFactory.builder()
+                .text("Фамилия")
+                .build();
+        ageFilter = FieldFactory.builder()
+                .text("Возраст")
+                .build();
+        searchBtn = ButtonFactory.builder()
+                .text("Поиск")
+                .icon(VaadinIcon.SEARCH)
+                .withClickListener(e -> listCustomers(lastNameFilter.getValue(), ageFilter.getValue()))
+                .build();
+        filterLayout = HorizontalLayoutFactory.builder()
+                .add(lastNameFilter, ageFilter, searchBtn)
+                .build();
+        addNewBtn = ButtonFactory.builder()
+                .text("Добавить")
+                .icon(VaadinIcon.PLUS)
+                .withClickListener(e -> editor.editCustomer(CustomerDto.builder()
+                        .build()))
+                .build();
+        actions = HorizontalLayoutFactory.builder()
+                .add(filterLayout, addNewBtn)
+                .build();
+    }
+
+    private void listCustomers(String lastNameFilter, String ageFilter) {
+        if (hasText(lastNameFilter) || hasText(ageFilter)) {
+            grid.setItems(customerService.findByFilter(lastNameFilter, castFilter(ageFilter)));
         } else {
             grid.setItems(customerService.findAll());
         }
     }
-    // end::listCustomers[]
+
+    private void listCustomers() {
+        grid.setItems(customerService.findAll());
+    }
+
+    private Integer castFilter(String number) {
+        if (!hasText(number)) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(number.trim());
+        } catch (NumberFormatException e) {
+            log.warn("Фильтр: {} в классе: {} не удалось преобразовать в Integer", number, getClass().getName());
+            return null;
+        }
+
+    }
 
 }

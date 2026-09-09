@@ -1,6 +1,7 @@
 package ru.savinov.bft_task.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,6 +14,8 @@ import ru.savinov.bft_task.frontend.mapper.CustomerMapper;
 import ru.savinov.bft_task.repository.CustomerRepository;
 
 import java.util.List;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Slf4j
 @Service
@@ -51,15 +54,10 @@ public class CustomerService {
         return customerMapper.toDtoList(customers);
     }
 
-    @Transactional(readOnly = true)
-    public List<CustomerDto> findByFilter() {
-        List<Customer> customers = customerRepository.findAll();
-        return customerMapper.toDtoList(customers);
-    }
 
     @Transactional(readOnly = true)
-    public List<CustomerDto> findByLastName(String lastname) {
-        List<Customer> customersByName = customerRepository.findByLastNameStartsWithIgnoreCase(lastname);
+    public List<CustomerDto> findByFilter(String lastname, Integer age) {
+        List<Customer> customersByName = customerRepository.findByLastNameAndAge(lastname, age);
         return customerMapper.toDtoList(customersByName);
     }
 

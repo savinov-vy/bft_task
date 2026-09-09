@@ -23,9 +23,6 @@ public class Customer {
     @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "patronymic")
-    private String patronymic;
-
     @Column(name = "age")
     private Integer age;
 

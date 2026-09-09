@@ -15,7 +15,6 @@ public class CustomerDto {
     private Long id;
     private String lastName;
     private String firstName;
-    private String patronymic;
     private Integer age;
     private BigDecimal payment;
 }

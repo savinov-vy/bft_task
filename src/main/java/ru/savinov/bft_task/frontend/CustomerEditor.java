@@ -45,8 +45,9 @@ public class CustomerEditor extends VerticalLayout implements KeyNotifier {
 
     @Autowired
     public CustomerEditor(CustomerService customerService) {
-        initUiComponents();
         this.customerService = customerService;
+
+        initUiComponents();
 
         add(firstName, lastName, actions);
 
