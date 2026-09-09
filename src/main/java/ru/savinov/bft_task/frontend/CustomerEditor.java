@@ -3,6 +3,7 @@ package ru.savinov.bft_task.frontend;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -54,8 +55,6 @@ public class CustomerEditor extends VerticalLayout implements KeyNotifier {
 
         add(firstName, lastName, age, payment, actions);
 
-        binder.bindInstanceFields(this);
-
         addKeyPressListener(Key.ENTER, e -> save());
 
         setVisible(false);
@@ -88,6 +87,24 @@ public class CustomerEditor extends VerticalLayout implements KeyNotifier {
                 .build();
         binder = BinderFactory.builder(CustomerDto.class)
                 .build();
+        initValidateField();
+    }
+
+    private void initValidateField() {
+        binder.forField(firstName)
+                .asRequired("Имя обязательно")
+                .withValidator(value -> value != null && value.length() >= 2,
+                        "Имя должно содержать минимум 2 символа")
+                .withValidator(value -> value != null && value.length() <= 50,
+                        "Имя не может быть длиннее 50 символов")
+                .bind(CustomerDto::getFirstName, CustomerDto::setFirstName);
+        binder.forField(lastName)
+                .asRequired("Фамилия обязательна")
+                .withValidator(value -> value != null && value.length() >= 2,
+                        "Фамилия должна содержать минимум 2 символа")
+                .withValidator(value -> value != null && value.length() <= 50,
+                        "Фамилия не может быть длиннее 50 символов")
+                .bind(CustomerDto::getLastName, CustomerDto::setLastName);
     }
 
     private void delete() {
@@ -97,6 +114,11 @@ public class CustomerEditor extends VerticalLayout implements KeyNotifier {
     }
 
     private void save() {
+        if (!binder.validate().isOk()) {
+            Notification.show("Проверьте правильность заполнения полей",
+                    3000, Notification.Position.MIDDLE);
+            return;
+        }
         log.info("Процесс сохранения [customer] c параметрами: {} в классе: {}", customer, getClass().getName());
         customerService.save(customer);
         changeHandler.onChange();

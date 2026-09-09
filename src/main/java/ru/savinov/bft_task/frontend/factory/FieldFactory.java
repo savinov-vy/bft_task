@@ -13,7 +13,7 @@ public class FieldFactory {
     public static class FieldBuilder {
         private String text = null;
         private String label = null;
-        private boolean required = false;
+        private boolean required = true;
         private String requiredMessage = "Поле обязательно для заполнения";
 
         public FieldBuilder text(String text) {
