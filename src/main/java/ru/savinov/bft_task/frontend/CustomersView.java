@@ -1,5 +1,6 @@
 package ru.savinov.bft_task.frontend;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.button.Button;
@@ -83,8 +84,10 @@ public class CustomersView extends VerticalLayout {
                 .text("Статистика")
                 .with("150px")
                 .icon(VaadinIcon.CHART)
-                .withClickListener(e -> editor.editCustomer(CustomerDto.builder()
-                        .build()))
+                .withClickListener(e -> {
+                    log.info("Открытие статистики в новой вкладке");
+                    UI.getCurrent().getPage().open("/statistics", "_blank");
+                })
                 .build();
         actions = HorizontalLayoutFactory.builder()
                 .add(filterLayout, addNewBtn, statisticBtn)

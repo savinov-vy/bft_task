@@ -1,7 +1,6 @@
 package ru.savinov.bft_task.frontend.factory;
 
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -25,12 +24,11 @@ public class GridFactory {
         private String height = HEIGHT_DEFAULT;
         private List<String> columns;
         private boolean withIdColumn = false;
-        private Collection<T> items;
-        private List<GridVariant> variants;
         private boolean withSelection = true;
         private boolean isVisible = true;
         private Consumer<T> selectionListener;
         private Map<String, String> columnHeaders = new LinkedHashMap<>();
+        private Collection<T> items;
 
         private GridBuilder() {
         }
@@ -47,6 +45,11 @@ public class GridFactory {
 
         public GridBuilder<T> columnHeader(String columnKey, String header) {
             this.columnHeaders.put(columnKey, header);
+            return this;
+        }
+
+        public GridBuilder<T> withItems(Collection<T> items) {
+            this.items = items;
             return this;
         }
 
@@ -74,16 +77,6 @@ public class GridFactory {
                         .setFlexGrow(0);
             }
 
-            if (variants != null && !variants.isEmpty()) {
-                for (GridVariant variant : variants) {
-                    grid.addThemeVariants(variant);
-                }
-            }
-
-            if (items != null) {
-                grid.setItems(items);
-            }
-
             if (withSelection) {
                 grid.asSingleSelect();
             }
@@ -101,6 +94,10 @@ public class GridFactory {
                         selectionListener.accept(e.getValue());
                     }
                 });
+            }
+
+            if (items != null && !items.isEmpty()) {
+                grid.setItems(items);
             }
 
             return grid;
