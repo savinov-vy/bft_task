@@ -1,52 +1,41 @@
 package ru.savinov.bft_task.frontend.factory;
 
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.value.ValueChangeMode;
-
-import java.util.function.Consumer;
 
 import static org.springframework.util.StringUtils.hasText;
 
 public class FieldFactory {
-
-    public static final String TEXT_DEFAULT = "";
 
     public static FieldBuilder builder() {
         return new FieldBuilder();
     }
 
     public static class FieldBuilder {
-        private Consumer<String> valueChangeListener;
-        private String text;
-        private boolean lazyMode = false;
+        private String text = null;
+        private String label = null;
+        private boolean required = false;
+        private String requiredMessage = "Поле обязательно для заполнения";
 
         public FieldBuilder text(String text) {
             this.text = text;
             return this;
         }
 
-        public FieldBuilder onChange(Consumer<String> listener) {
-            this.valueChangeListener = listener;
-            return this;
-        }
-
-        public FieldBuilder lazy(boolean lazy) {
-            this.lazyMode = lazy;
+        public FieldBuilder label(String label) {
+            this.label = label;
             return this;
         }
 
         public TextField build() {
-            TextField field = new TextField(hasText(text) ? text : TEXT_DEFAULT);
+            TextField field = new TextField(hasText(text) ? text : null);
 
-            if (lazyMode) {
-                field.setValueChangeMode(ValueChangeMode.LAZY);
+            if (required) {
+                field.setRequiredIndicatorVisible(true);
+                field.setErrorMessage(requiredMessage);
             }
 
-            if (valueChangeListener != null) {
-                field.addValueChangeListener(e -> {
-                    String value = e.getValue();
-                    valueChangeListener.accept(value != null ? value : "");
-                });
+            if (hasText(label)) {
+                field.setLabel(label);
             }
 
             return field;

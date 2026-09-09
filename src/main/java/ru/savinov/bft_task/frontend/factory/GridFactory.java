@@ -3,9 +3,7 @@ package ru.savinov.bft_task.frontend.factory;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class GridFactory {
@@ -32,6 +30,7 @@ public class GridFactory {
         private boolean withSelection = true;
         private boolean isVisible = true;
         private Consumer<T> selectionListener;
+        private Map<String, String> columnHeaders = new LinkedHashMap<>();
 
         private GridBuilder() {
         }
@@ -41,40 +40,13 @@ public class GridFactory {
             return this;
         }
 
-        public GridBuilder<T> height(String height) {
-            this.height = height;
-            return this;
-        }
-
-
-
         public GridBuilder<T> columns(String... columns) {
             this.columns = Arrays.asList(columns);
             return this;
         }
 
-        public GridBuilder<T> withIdColumn() {
-            this.withIdColumn = true;
-            return this;
-        }
-
-        public GridBuilder<T> withItems(Collection<T> items) {
-            this.items = items;
-            return this;
-        }
-
-        public GridBuilder<T> withVariants(GridVariant... variants) {
-            this.variants = Arrays.asList(variants);
-            return this;
-        }
-
-        public GridBuilder<T> withSelection(boolean withSelection) {
-            this.withSelection = withSelection;
-            return this;
-        }
-
-        public GridBuilder<T> visible(boolean visible) {
-            this.isVisible = visible;
+        public GridBuilder<T> columnHeader(String columnKey, String header) {
+            this.columnHeaders.put(columnKey, header);
             return this;
         }
 
@@ -114,6 +86,13 @@ public class GridFactory {
 
             if (withSelection) {
                 grid.asSingleSelect();
+            }
+
+            for (Map.Entry<String, String> entry : columnHeaders.entrySet()) {
+                Grid.Column<T> column = grid.getColumnByKey(entry.getKey());
+                if (column != null) {
+                    column.setHeader(entry.getValue());
+                }
             }
 
             if (withSelection) {

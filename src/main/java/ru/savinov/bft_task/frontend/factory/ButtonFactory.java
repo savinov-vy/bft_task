@@ -38,6 +38,7 @@ public class ButtonFactory {
 
     public static class ButtonBuilder {
         private String text;
+        private String with = WITH_DEFAULT;
         private VaadinIcon icon;
         private ButtonVariant[] variants = {};
         private Consumer<Button> clickListener;
@@ -49,6 +50,11 @@ public class ButtonFactory {
 
         public ButtonBuilder icon(VaadinIcon icon) {
             this.icon = icon;
+            return this;
+        }
+
+        public ButtonBuilder with(String with) {
+            this.with = with;
             return this;
         }
 
@@ -72,7 +78,7 @@ public class ButtonFactory {
                 button.addClickListener(e -> clickListener.accept(button));
             }
 
-            button.setWidth(WITH_DEFAULT);
+            button.setWidth(with);
             button.setEnabled(true);
 
             if (variants.length > 0) {

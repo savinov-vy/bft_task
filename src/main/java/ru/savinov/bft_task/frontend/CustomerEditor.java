@@ -35,10 +35,13 @@ public class CustomerEditor extends VerticalLayout implements KeyNotifier {
 
     TextField firstName;
     TextField lastName;
+    TextField age;
+    TextField payment;
 
     Button saveBtn;
     Button cancelBtn;
     Button deleteBtn;
+    HorizontalLayout fields;
     HorizontalLayout actions;
     Binder<CustomerDto> binder;
     private ChangeHandler changeHandler;
@@ -49,7 +52,7 @@ public class CustomerEditor extends VerticalLayout implements KeyNotifier {
 
         initUiComponents();
 
-        add(firstName, lastName, actions);
+        add(firstName, lastName, age, payment, actions);
 
         binder.bindInstanceFields(this);
 
@@ -59,11 +62,17 @@ public class CustomerEditor extends VerticalLayout implements KeyNotifier {
     }
 
     private void initUiComponents() {
-        lastName = FieldFactory.builder()
-                .text("Last Name")
-                .build();
         firstName = FieldFactory.builder()
-                .text("First Name")
+                .label("Имя")
+                .build();
+        lastName = FieldFactory.builder()
+                .label("Фамилия")
+                .build();
+        age = FieldFactory.builder()
+                .label("Возраст")
+                .build();
+        payment = FieldFactory.builder()
+                .label("Платеж")
                 .build();
         saveBtn = ButtonFactory.saveBtn()
                 .withClickListener(e -> save())

@@ -26,8 +26,9 @@ public class CustomersView extends VerticalLayout {
 
     private Grid<CustomerDto> grid;
 
-    private Button addNewBtn;
     private Button searchBtn;
+    private Button addNewBtn;
+    private Button statisticBtn;
     private HorizontalLayout actions;
 
     private HorizontalLayout filterLayout;
@@ -50,6 +51,11 @@ public class CustomersView extends VerticalLayout {
     private void initUiComponents() {
         grid = GridFactory.builder(CustomerDto.class)
                 .columns("id", "firstName", "lastName", "age", "payment")
+                .columnHeader("id", "id")
+                .columnHeader("firstName", "Имя")
+                .columnHeader("lastName", "Фамилия")
+                .columnHeader("age", "Возраст")
+                .columnHeader("payment", "Платеж")
                 .onSelect(editor::editCustomer)
                 .build();
         lastNameFilter = FieldFactory.builder()
@@ -68,12 +74,20 @@ public class CustomersView extends VerticalLayout {
                 .build();
         addNewBtn = ButtonFactory.builder()
                 .text("Добавить")
+                .with("150px")
                 .icon(VaadinIcon.PLUS)
                 .withClickListener(e -> editor.editCustomer(CustomerDto.builder()
                         .build()))
                 .build();
+        statisticBtn = ButtonFactory.builder()
+                .text("Статистика")
+                .with("150px")
+                .icon(VaadinIcon.CHART)
+                .withClickListener(e -> editor.editCustomer(CustomerDto.builder()
+                        .build()))
+                .build();
         actions = HorizontalLayoutFactory.builder()
-                .add(filterLayout, addNewBtn)
+                .add(filterLayout, addNewBtn, statisticBtn)
                 .build();
     }
 

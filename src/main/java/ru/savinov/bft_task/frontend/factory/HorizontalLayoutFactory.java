@@ -1,6 +1,7 @@
 package ru.savinov.bft_task.frontend.factory;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public class HorizontalLayoutFactory {
 
     public static class HorizontalLayoutBuilder {
         private final List<Component> components = new ArrayList<>();
+        private FlexComponent.Alignment alignment = FlexComponent.Alignment.END;
 
         public HorizontalLayoutBuilder add(Component... components) {
             this.components.addAll(Arrays.asList(components));
@@ -29,6 +31,7 @@ public class HorizontalLayoutFactory {
         public HorizontalLayout build() {
             HorizontalLayout layout = new HorizontalLayout();
             layout.add(components.toArray(new Component[0]));
+            layout.setAlignItems(alignment);
             return layout;
         }
     }
