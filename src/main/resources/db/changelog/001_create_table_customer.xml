@@ -20,6 +20,9 @@
                 age INT,
                 payment NUMERIC(19, 2)
                 );
+            CREATE INDEX IF NOT EXISTS idx_customer_last_name ON customer(last_name);
+            CREATE INDEX IF NOT EXISTS idx_customer_age ON customer(age);
+            CREATE INDEX IF NOT EXISTS idx_customer_last_name_age ON customer(last_name, age);
         </sql>
     </changeSet>
 </databaseChangeLog>
