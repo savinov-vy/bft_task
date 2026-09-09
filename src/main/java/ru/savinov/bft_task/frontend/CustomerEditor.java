@@ -6,6 +6,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -22,6 +23,7 @@ import ru.savinov.bft_task.frontend.factory.HorizontalLayoutFactory;
 import ru.savinov.bft_task.frontend.function.ChangeHandler;
 import ru.savinov.bft_task.service.CustomerService;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 
@@ -36,8 +38,8 @@ public class CustomerEditor extends VerticalLayout implements KeyNotifier {
 
     TextField firstName;
     TextField lastName;
-    TextField age;
-    TextField payment;
+    NumberField age;
+    NumberField payment;
 
     Button saveBtn;
     Button cancelBtn;
@@ -61,16 +63,16 @@ public class CustomerEditor extends VerticalLayout implements KeyNotifier {
     }
 
     private void initUiComponents() {
-        firstName = FieldFactory.builder()
+        firstName = FieldFactory.textFieldBuilder()
                 .label("Имя")
                 .build();
-        lastName = FieldFactory.builder()
+        lastName = FieldFactory.textFieldBuilder()
                 .label("Фамилия")
                 .build();
-        age = FieldFactory.builder()
+        age = FieldFactory.numberFieldBuilder()
                 .label("Возраст")
                 .build();
-        payment = FieldFactory.builder()
+        payment = FieldFactory.numberFieldBuilder()
                 .label("Платеж")
                 .build();
         saveBtn = ButtonFactory.saveBtn()
@@ -105,6 +107,31 @@ public class CustomerEditor extends VerticalLayout implements KeyNotifier {
                 .withValidator(value -> value != null && value.length() <= 50,
                         "Фамилия не может быть длиннее 50 символов")
                 .bind(CustomerDto::getLastName, CustomerDto::setLastName);
+
+        binder.forField(age)
+                .withValidator(value -> value == null || (value >= 0 && value <= 150),
+                        "Возраст должен быть от 0 до 150")
+                .bind(
+                        (dto) -> dto.getAge() != null ? dto.getAge().doubleValue() : null,
+                        (dto, val) -> dto.setAge(val != null ? val.intValue() : null)
+                );
+        binder.forField(payment)
+                .withConverter(
+                        (Double value) -> {
+                            if (value == null) return null;
+                            return BigDecimal.valueOf(value);
+                        },
+                        (BigDecimal value) -> {
+                            if (value == null) return null;
+                            return value.doubleValue();
+                        }
+                )
+                .withValidator(value -> {
+                    if (value == null) return true;
+                    return value.compareTo(BigDecimal.ZERO) >= 0 &&
+                            value.compareTo(new BigDecimal("99999999.99")) <= 0;
+                }, "Платеж должен быть от 0 до 99 999 999.99")
+                .bind(CustomerDto::getPayment, CustomerDto::setPayment);
     }
 
     private void delete() {

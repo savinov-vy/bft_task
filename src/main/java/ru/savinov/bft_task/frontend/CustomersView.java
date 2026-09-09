@@ -59,10 +59,12 @@ public class CustomersView extends VerticalLayout {
                 .columnHeader("payment", "Платеж")
                 .onSelect(editor::editCustomer)
                 .build();
-        lastNameFilter = FieldFactory.builder()
+        lastNameFilter = FieldFactory.textFieldBuilder()
+                .required(false)
                 .text("Фамилия")
                 .build();
-        ageFilter = FieldFactory.builder()
+        ageFilter = FieldFactory.textFieldBuilder()
+                .required(false)
                 .text("Возраст")
                 .build();
         searchBtn = ButtonFactory.builder()
