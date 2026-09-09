@@ -1,10 +1,7 @@
 package ru.savinov.bft_task.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -28,6 +25,9 @@ public class Customer {
 
     @Column(name = "patronymic")
     private String patronymic;
+
+    @Column(name = "age")
+    private Integer age;
 
     @Column(precision = 19, scale = 2, name = "payment")
     private BigDecimal payment;

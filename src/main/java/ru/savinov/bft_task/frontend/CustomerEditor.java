@@ -3,8 +3,6 @@ package ru.savinov.bft_task.frontend;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -13,122 +11,112 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.savinov.bft_task.entity.Customer;
-import ru.savinov.bft_task.factory.ButtonFactory;
-import ru.savinov.bft_task.factory.FieldFactory;
-import ru.savinov.bft_task.factory.HorizontalLayoutFactory;
-import ru.savinov.bft_task.repository.CustomerRepository;
+import ru.savinov.bft_task.frontend.dto.CustomerDto;
+import ru.savinov.bft_task.frontend.factory.BinderFactory;
+import ru.savinov.bft_task.frontend.factory.ButtonFactory;
+import ru.savinov.bft_task.frontend.factory.FieldFactory;
+import ru.savinov.bft_task.frontend.factory.HorizontalLayoutFactory;
+import ru.savinov.bft_task.frontend.function.ChangeHandler;
+import ru.savinov.bft_task.service.CustomerService;
+
+import java.util.Optional;
 
 
+@Slf4j
 @SpringComponent
 @UIScope
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerEditor extends VerticalLayout implements KeyNotifier {
 
-    final CustomerRepository repository;
-    Customer customer;
+    final CustomerService customerService;
+    CustomerDto customer;
 
     TextField firstName;
     TextField lastName;
 
-    Button save;
-    Button cancel;
-    Button delete;
+    Button saveBtn;
+    Button cancelBtn;
+    Button deleteBtn;
     HorizontalLayout actions;
-
-    Binder<Customer> binder = new Binder<>(Customer.class);
+    Binder<CustomerDto> binder;
     private ChangeHandler changeHandler;
 
     @Autowired
-    public CustomerEditor(CustomerRepository repository) {
-        initFields();
-        this.repository = repository;
+    public CustomerEditor(CustomerService customerService) {
+        initUiComponents();
+        this.customerService = customerService;
 
         add(firstName, lastName, actions);
 
         binder.bindInstanceFields(this);
-
-        setSpacing(true);
 
         addKeyPressListener(Key.ENTER, e -> save());
 
         setVisible(false);
     }
 
-    private void initFields() {
+    private void initUiComponents() {
         lastName = FieldFactory.builder()
                 .text("Last Name")
                 .build();
         firstName = FieldFactory.builder()
                 .text("First Name")
                 .build();
-        save = ButtonFactory.builder()
-                .icon(VaadinIcon.CHECK)
-                .text("Save")
-                .theme(ButtonVariant.LUMO_PRIMARY)
+        saveBtn = ButtonFactory.saveBtn()
                 .withClickListener(e -> save())
                 .build();
-        cancel = ButtonFactory.builder()
-                .text("Cancel")
+        cancelBtn = ButtonFactory.cancelBtn()
                 .withClickListener(e -> editCustomer(customer))
                 .build();
-        delete = ButtonFactory.builder()
-                .theme(ButtonVariant.LUMO_ERROR)
-                .text("Delete")
-                .icon(VaadinIcon.TRASH)
+        deleteBtn = ButtonFactory.deleteBtn()
                 .withClickListener(e -> delete())
                 .build();
         actions = HorizontalLayoutFactory.builder()
-                .add(save, cancel, delete)
+                .add(saveBtn, cancelBtn, deleteBtn)
+                .build();
+        binder = BinderFactory.builder(CustomerDto.class)
                 .build();
     }
 
-    void delete() {
-        repository.delete(customer);
+    private void delete() {
+        log.info("Процесс удаления [customer] c параметрами: {} в классе: {}", customer, getClass().getName());
+        customerService.delete(customer);
         changeHandler.onChange();
     }
 
-    void save() {
-        repository.save(customer);
+    private void save() {
+        log.info("Процесс сохранения [customer] c параметрами: {} в классе: {}", customer, getClass().getName());
+        customerService.save(customer);
         changeHandler.onChange();
     }
 
-    public interface ChangeHandler {
-        void onChange();
-    }
-
-    public final void editCustomer(Customer c) {
-        if (c == null) {
+    public final void editCustomer(CustomerDto customer) {
+        log.info("Процесс редактирования [customer] c параметрами: {} в классе: {}", customer, getClass().getName());
+        if (customer == null) {
             setVisible(false);
             return;
         }
-        final boolean persisted = c.getId() != null;
-        if (persisted) {
-            // Find fresh entity for editing
-            // In a more complex app, you might want to load
-            // the entity/DTO with lazy loaded relations for editing
-            customer = repository.findById(c.getId()).get();
+        if (isSaved(customer)) {
+            this.customer = customerService.findById(customer.getId());
         } else {
-            customer = c;
+            this.customer = customer;
         }
-        cancel.setVisible(persisted);
-
-        // Bind customer properties to similarly named fields
-        // Could also use annotation or "manual binding" or programmatically
-        // moving values from fields to entities before saving
-        binder.setBean(customer);
-
+        cancelBtn.setVisible(isSaved(customer));
+        binder.setBean(this.customer);
         setVisible(true);
-
-        // Focus first name initially
         firstName.focus();
     }
 
     public void setChangeHandler(ChangeHandler h) {
-        // ChangeHandler is notified when either save or delete
-        // is clicked
         changeHandler = h;
+    }
+
+    private boolean isSaved(CustomerDto customer) {
+        return Optional.ofNullable(customer)
+                .map(CustomerDto::getId)
+                .isPresent();
     }
 
 }

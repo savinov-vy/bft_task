@@ -1,4 +1,4 @@
-package ru.savinov.bft_task.factory;
+package ru.savinov.bft_task.frontend.factory;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -12,6 +12,25 @@ public class ButtonFactory {
 
     public static final String WITH_DEFAULT = "100px";
     public static final String TEXT_DEFAULT = "";
+
+    public static ButtonBuilder cancelBtn() {
+        return ButtonFactory.builder()
+                .text("Cancel");
+    }
+
+    public static ButtonBuilder deleteBtn() {
+        return ButtonFactory.builder()
+                .theme(ButtonVariant.LUMO_ERROR)
+                .text("Delete")
+                .icon(VaadinIcon.TRASH);
+    }
+
+    public static ButtonBuilder saveBtn() {
+        return ButtonFactory.builder()
+                .icon(VaadinIcon.CHECK)
+                .text("Save")
+                .theme(ButtonVariant.LUMO_PRIMARY);
+    }
 
     public static ButtonBuilder builder() {
         return new ButtonBuilder();

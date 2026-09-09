@@ -9,25 +9,25 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import ru.savinov.bft_task.entity.Customer;
-import ru.savinov.bft_task.repository.CustomerRepository;
+import ru.savinov.bft_task.frontend.dto.CustomerDto;
+import ru.savinov.bft_task.service.CustomerService;
 
 @Route
 public class CustomersView extends VerticalLayout {
-    private final CustomerRepository repo;
+    private final CustomerService customerService;
 
     private final CustomerEditor editor;
 
-    final Grid<Customer> grid;
+    final Grid<CustomerDto> grid;
 
     final TextField filter;
 
     private final Button addNewBtn;
 
-    public CustomersView(CustomerRepository repo, CustomerEditor editor) {
-        this.repo = repo;
+    public CustomersView(CustomerService customerService, CustomerEditor editor) {
+        this.customerService = customerService;
         this.editor = editor;
-        this.grid = new Grid<>(Customer.class);
+        this.grid = new Grid<>(CustomerDto.class);
         this.filter = new TextField();
         this.addNewBtn = new Button("New customer", VaadinIcon.PLUS.create());
 
@@ -54,7 +54,7 @@ public class CustomersView extends VerticalLayout {
 
         // Instantiate and edit new Customer the new button is clicked
         addNewBtn.addClickListener(
-                e -> editor.editCustomer(Customer.builder()
+                e -> editor.editCustomer(CustomerDto.builder()
                                                                 .lastName("")
                                                                 .firstName("")
                                                                 .build())
@@ -73,9 +73,9 @@ public class CustomersView extends VerticalLayout {
     // tag::listCustomers[]
     void listCustomers(String filterText) {
         if (StringUtils.hasText(filterText)) {
-            grid.setItems(repo.findByLastNameStartsWithIgnoreCase(filterText));
+            grid.setItems(customerService.findByLastName(filterText));
         } else {
-            grid.setItems(repo.findAll());
+            grid.setItems(customerService.findAll());
         }
     }
     // end::listCustomers[]

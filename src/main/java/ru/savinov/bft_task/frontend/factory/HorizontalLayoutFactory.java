@@ -1,4 +1,4 @@
-package ru.savinov.bft_task.factory;
+package ru.savinov.bft_task.frontend.factory;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;

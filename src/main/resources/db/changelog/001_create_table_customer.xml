@@ -18,6 +18,7 @@
                 first_name VARCHAR(255) NOT NULL,
                 last_name VARCHAR(255) NOT NULL,
                 patronymic VARCHAR(255),
+                age INT,
                 payment NUMERIC(19, 2)
                 );
         </sql>
