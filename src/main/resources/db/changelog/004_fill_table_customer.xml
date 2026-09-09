@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="fill table customer" author="savinov">
+        <sql>
+            INSERT INTO customer (last_name, first_name, age, payment)
+            VALUES ('Пушкин', 'Александр', 30, 25000.00),
+                   ('Петров', 'Петр', 30, 30000.00),
+                   ('Сидоров', 'Сергей', 45, 50000.00),
+                   ('Толстой', 'Алексей', 22, 15000.00),
+                   ('Морозов', 'Дмитрий', 35, 42000.00)
+        </sql>
+    </changeSet>
+</databaseChangeLog>

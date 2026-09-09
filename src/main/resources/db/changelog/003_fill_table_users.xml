@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="fill table users" author="savinov">
+        <sql>
+            INSERT INTO users (username, password, role)
+            VALUES ('admin', '$2a$12$0R3jj3o/3EEufZqDi82pAuOHGdACAIixnCHdHpnymHmHw6pCPYFpe', 'ADMIN')
+        </sql>
+    </changeSet>
+</databaseChangeLog>
